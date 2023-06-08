@@ -1,32 +1,36 @@
 # TASK 1
-
 import logging
+import os
 
 from aiogram import Bot, Dispatcher, executor, types
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram.dispatcher import FSMContext
 
-API_TOKEN = '6005423465:AAGc51detDC_Utw3NmFI6HhbpY707ueJe6s'
+TOKEN = os.environ["6005423465:AAGc51detDC_Utw3NmFI6HhbpY707ueJe6s"]
 
 logging.basicConfig(level=logging.INFO)
 
-bot = Bot(token=API_TOKEN)
-dp = Dispatcher(bot)
+bot = Bot(token=TOKEN)
+dp = Dispatcher(bot=bot, storage=MemoryStorage())
 
 
-@dp.message_handler(commands=['start'])
-async def start_command(message: types.Message):
-    word = ""
-    await message.reply("Iltimos, biror bir so'z kiriting!:")
-    for i in message:
-        if i in 'aeiou':
-            word+=i
-
-    if len(word) > 5:
-        await message.delete()
+@dp.message_handler(commands=['start', 'help'])
+async def send_welcome(message: types.Message, state: FSMContext):
+    await message.reply(f"Assalomu alaykum {message.from_user.full_name} 😊")
+    await message.answer("Text Kiriting")
+    await state.set_state("text")
 
 
-@dp.message_handler()
-async def echo(message: types.Message):
-    await message.answer(message.text)
+@dp.message_handler(state="text")
+async def echo(message: types.Message, state: FSMContext):
+    All_vowels = "aeiouAEIOU"
+    summa = sum([1 for i in message.text if i in All_vowels])
+    if summa >= 5:
+        await message.answer("Text unlilar soni 5 dan oshib ketti. Qayta kiriting")
+        await state.set_state("text")
+    else:
+        await state.set_state("text")
+
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
@@ -90,7 +94,7 @@ if __name__ == '__main__':
 # from: {}
 # to: {}
 # subject:
-#      this email sent by python script
+#     https://github.com/tamannoxonumarova/tamanno_exam_bot.git
 # """.format(sender,reciver)
 #
 # with smtplib.SMTP_SSL(server,port) as server:

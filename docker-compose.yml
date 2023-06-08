@@ -1,31 +1,12 @@
 version: '3.11'
 
-
 services:
   bot:
     build: .
     working_dir: /apps
-    container_name: wiki_bot
+    container_name: exam_bot
     environment:
-      DATABASE: postgres
-      DB_HOST: pg
-      DB_USER: postgres
-      DB_PORT: 5432
       Token: ${Token}
     command: python main.py
-    depends_on:
-      - pg
 
-  pg:
-    image: postgres:15.3-alpine
-    restart: always
-    container_name: my_postgres
-    environment:
-      - POSTGRES_PASSWORD=1
-    volumes:
-      - pg_data:/var/lib/postgresql/data/
-    ports:
-      - "5432:5432"
-volumes:
-  pg_data:
 
